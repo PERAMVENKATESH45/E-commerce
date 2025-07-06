@@ -1,3 +1,6 @@
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+dotenv.config();
 const Product = require("../models/Product");
 
 const products = [
@@ -2022,11 +2025,21 @@ const products = [
   },
 ];
 
-exports.seedProduct = async () => {
+
+const seed = async () => {
   try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    await Product.deleteMany(); // clear old data
     await Product.insertMany(products);
-    console.log("Product seeded successfully");
-  } catch (error) {
-    console.log(error);
+
+    console.log("✅ Products seeded successfully");
+    process.exit();
+  } catch (err) {
+    console.error("❌ Error seeding products:", err);
+    process.exit(1);
   }
 };
